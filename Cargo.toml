@@ -1,0 +1,12 @@
+[package]
+name = "one_brc_test"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dhat = "0.3.3"
+memchr = "2.7.6"
+regex = "1.12.1"
+
+[features]
+dhat-heap = []

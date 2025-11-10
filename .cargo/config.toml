@@ -1,0 +1,12 @@
+[profile.release]
+opt-level = 3
+target-cpu = "native"
+# lto = "fat"
+# codegen-units = 1
+# strip = "debuginfo"
+
+[profile.profiling]
+inherits = "release"
+debug = true
+strip = "none"
+force-frame-pointers = true

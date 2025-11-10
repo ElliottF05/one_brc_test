@@ -1,0 +1,413 @@
+Jos
+Wau
+Abha
+Aden
+Baku
+Bata
+Dili
+Juba
+Kano
+Kyiv
+Lviv
+Lyon
+Maun
+Naha
+Nuuk
+Oslo
+Oulu
+Riga
+Rome
+Suva
+Lomé
+Malé
+Accra
+Ahvaz
+Assab
+Birao
+Boise
+Busan
+Cairo
+Dakar
+Dhaka
+Dubai
+Erbil
+Hanoi
+Kabul
+Kandi
+Kyoto
+Lagos
+Lhasa
+Mango
+Medan
+Miami
+Milan
+Minsk
+Mzuzu
+Ndola
+Odesa
+Omaha
+Paris
+Perth
+Porto
+Praia
+Rabat
+Seoul
+Sochi
+Sofia
+Split
+Tampa
+Tokyo
+Tunis
+Vaduz
+Xi'an
+Gabès
+Ségou
+Thiès
+İzmir
+Almaty
+Anadyr
+Ankara
+Asmara
+Astana
+Athens
+Austin
+Baguio
+Bamako
+Bangui
+Banjul
+Batumi
+Beirut
+Bergen
+Berlin
+Bilbao
+Bissau
+Bosaso
+Boston
+Burnie
+Cairns
+Cracow
+Da Lat
+Dallas
+Darwin
+Denver
+Dikson
+Dodoma
+Douala
+Dublin
+Durban
+Fresno
+Gagnoa
+Garoua
+Ghanzi
+Harare
+Harbin
+Havana
+Hobart
+Ifrane
+Kankan
+Kumasi
+Kuopio
+La Paz
+Lahore
+Lisbon
+Lodwar
+London
+Luanda
+Lusaka
+Madrid
+Malabo
+Manama
+Manila
+Maputo
+Monaco
+Moscow
+Mumbai
+Muscat
+Napier
+Napoli
+Nassau
+Niamey
+Ottawa
+Prague
+Riyadh
+Roseau
+Sana'a
+Skopje
+Sokoto
+Sydney
+Tabora
+Tabriz
+Taipei
+Tamale
+Tehran
+Tirana
+Toluca
+Tucson
+Vienna
+Warsaw
+Yangon
+Zagreb
+Bouaké
+Tromsø
+Zürich
+Abéché
+Ürümqi
+Abidjan
+Algiers
+Atlanta
+Baghdad
+Bangkok
+Beijing
+Bishkek
+Calgary
+Chicago
+Colombo
+Conakry
+Cotonou
+Da Nang
+Dampier
+Detroit
+Dolisie
+Dunedin
+El Paso
+Entebbe
+Erzurum
+Fukuoka
+Gangtok
+Garissa
+Halifax
+Hamburg
+Hat Yai
+Honiara
+Houston
+Iqaluit
+Irkutsk
+Jakarta
+Kampala
+Karachi
+Karonga
+Kolkata
+Kunming
+Makurdi
+Managua
+Mek'ele
+Memphis
+Mombasa
+Moncton
+Nairobi
+Nicosia
+Niigata
+Palermo
+Parakou
+Phoenix
+Rangpur
+Reggane
+Sapporo
+Seattle
+Seville
+Tallinn
+Tbilisi
+Tijuana
+Toliara
+Toronto
+Tripoli
+Vilnius
+Wichita
+Yakutsk
+Yerevan
+Odienné
+Suwałki
+Wrocław
+Yaoundé
+Adelaide
+Ashgabat
+Auckland
+Belgrade
+Benghazi
+Blantyre
+Bordeaux
+Brisbane
+Brussels
+Budapest
+Bulawayo
+Canberra
+Changsha
+Columbus
+Damascus
+Denpasar
+Djibouti
+Dushanbe
+Edmonton
+Gaborone
+Hamilton
+Hargeisa
+Helsinki
+Honolulu
+Istanbul
+Jayapura
+Khartoum
+Kingston
+Kinshasa
+La Ceiba
+Makassar
+Mandalay
+Mexicali
+Montreal
+Murmansk
+Pretoria
+San Jose
+San Juan
+Sarajevo
+Shanghai
+Surabaya
+Tashkent
+Tauranga
+Tel Aviv
+Timbuktu
+Upington
+Valencia
+Valletta
+Veracruz
+Winnipeg
+Yinchuan
+San José
+Chișinău
+Alexandra
+Amsterdam
+Anchorage
+Baltimore
+Barcelona
+Bucharest
+Bujumbura
+Cape Town
+Charlotte
+Chihuahua
+Chongqing
+Edinburgh
+Fairbanks
+Frankfurt
+Guangzhou
+Hanga Roa
+Heraklion
+Hiroshima
+Hong Kong
+Jerusalem
+Kathmandu
+Las Vegas
+Ljubljana
+Mahajanga
+Marrakesh
+Marseille
+Melbourne
+Milwaukee
+Mogadishu
+Monterrey
+N'Djamena
+Nashville
+New Delhi
+Palembang
+Podgorica
+Pontianak
+Port Vila
+Pyongyang
+San Diego
+Saskatoon
+Singapore
+St. Louis
+Stockholm
+Toamasina
+Vancouver
+Vientiane
+Reykjavík
+Alexandria
+Bratislava
+Bridgetown
+Chiang Mai
+Chittagong
+Copenhagen
+Gjoa Haven
+Launceston
+Libreville
+Louisville
+Lubumbashi
+Nouadhibou
+Nouakchott
+Oranjestad
+Ouahigouya
+Ouarzazate
+Phnom Penh
+Pittsburgh
+Port Sudan
+Sacramento
+St. John's
+Wellington
+Whitehorse
+Willemstad
+Ngaoundéré
+Addis Ababa
+Albuquerque
+Antsiranana
+Arkhangelsk
+Belize City
+Brazzaville
+George Town
+Guadalajara
+Kansas City
+Kuwait City
+Lake Tekapo
+Livingstone
+Los Angeles
+Mexico City
+Minneapolis
+New Orleans
+Novosibirsk
+Ouagadougou
+Panama City
+Port-Gentil
+San Antonio
+Tamanrasset
+Tegucigalpa
+Ulaanbaatar
+Vladivostok
+Yellowknife
+Antananarivo
+Bloemfontein
+Christchurch
+Fianarantsoa
+Indianapolis
+Jacksonville
+Johannesburg
+Kuala Lumpur
+Palm Springs
+Philadelphia
+Pointe-Noire
+Port Moresby
+Saint-Pierre
+San Salvador
+Thessaloniki
+Villahermosa
+Alice Springs
+Dar es Salaam
+New York City
+Oklahoma City
+Portland (OR)
+Rostov-on-Don
+San Francisco
+Santo Domingo
+Zanzibar City
+Cabo San Lucas
+Guatemala City
+Salt Lake City
+Virginia Beach
+Flores,  Petén
+Luxembourg City
+Andorra la Vella
+Ho Chi Minh City
+Lake Havasu City
+Palmerston North
+Saint Petersburg
+Washington, D.C.
+Nakhon Ratchasima
+City of San Marino
+Petropavlovsk-Kamchatsky
+Las Palmas de Gran Canaria
