@@ -50,6 +50,7 @@ mod v12;
 mod v13;
 mod v14;
 mod v15;
+mod v16;
 
 use std::time::Instant;
 
@@ -74,7 +75,7 @@ fn main() {
     // return;
 
     // run the 1brc code
-    let results = v15::run(MEASUREMENTS_PATH);
+    let results = v16::run(MEASUREMENTS_PATH);
 
     println!("Run completed in: {:?} seconds", start.elapsed().as_secs_f32());
 

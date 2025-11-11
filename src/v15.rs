@@ -1,100 +1,126 @@
 // Goal:
-//      - Try using SIMD!!
+//      - Parallelization!!!!
 //
 // Change:
-//      - Do what I said above
+//      - Break up scan file into equal sized segments
+//      - One thread per segment
+//      - Use file.read_at to read at segment locations + offsets
+//      - Use heap allocated buffers (buf and CustomHashMap.backing) to avoid stack overflow
+//      
 //
 // Result:
-//      - Time taken is now around 14.3s, around a 20% improvement!
+//      - Time taken is now around 4s, around a great 72% improvement!!
 //
 // Analysis:
-//      - SIMD is awesome
+//      - Parallelism is cool
 
 
-use std::{fs::File, i32, io::{BufRead, BufReader}, simd::{Simd, cmp::SimdPartialEq, u8x16}};
+use std::{fs::File, i32, os::unix::fs::FileExt, simd::{Simd, cmp::SimdPartialEq, u8x16}, thread};
 
 use memchr::memchr;
 
 pub fn run(measurements_path: &str) -> String {
+    const NUM_SEGMENTS: usize = 7;
     let measurements_file = std::fs::File::open(measurements_path).unwrap();
 
-    let buf_reader = BufReader::with_capacity(16 * 16 * 1024, measurements_file);
-    let mut map = CustomHashMap::new();
+    let split_indices = find_segment_splits(&measurements_file, NUM_SEGMENTS);
 
-    custom_scan_file(buf_reader, &mut map);
+    let handles: Vec<_> = split_indices
+        .into_iter()
+        .map(|(start, end)| {
+            let file = measurements_file.try_clone().unwrap();
+            thread::spawn(move || {
+                scan_file_segment(&file, start, end)
+            })
+        })
+        .collect();
+    
+    let maps: Vec<_> = handles
+        .into_iter()
+        .map(|h| 
+            h.join().unwrap()
+        )
+        .collect();
+    
+    let mut merged_map = CustomHashMap::new();
+    for i in 0..merged_map.backing.len() {
+        if maps[0].backing[i].count == 0 {
+            continue;
+        }
+        let accum = &mut merged_map.backing[i];
+        for j in 0..NUM_SEGMENTS {
+            let other = &maps[j].backing[i];
+            accum.merge_with(other);
+        }
+    }
 
-    return format_output(&map);
+    return format_output(&merged_map);
 }
 
-fn custom_scan_file(mut buf_reader: BufReader<File>, map: &mut CustomHashMap) {
-    let mut carry = Vec::with_capacity(256);
+fn find_segment_splits(file: &File, num_segments: usize) -> Vec<(usize, usize)> {
+    let file_len = file.metadata().unwrap().len() as usize;
+    let expected_segment_size = file_len / num_segments;
+
+    let buf: &mut [u8] = &mut [0u8 ; 64];
+
+    let mut prev = 0;
+    let mut split_indices = vec![];
+    for i in 1..num_segments {
+        let search_start = i * expected_segment_size;
+        file.read_exact_at(buf, search_start as u64).unwrap();
+        let j = buf.iter().position(|c| *c == b'\n').unwrap();
+
+        let curr = search_start + j + 1;
+        split_indices.push((prev, curr));
+        prev = curr;
+    }
+    split_indices.push((prev, file_len));
+
+    return split_indices;
+}
+
+fn scan_file_segment(file: &File, start_pos: usize, end_pos: usize) -> CustomHashMap {
+    const BUF_SIZE: usize = 16 * 1024 * 1024;
+    let mut buf = vec![0u8; BUF_SIZE];
+    let mut offset = start_pos;
+
+    let mut map = CustomHashMap::new();
 
     loop {
-        let buf_len;
-        {
-            // println!("SCANNING CHUNK");
-            // get a direct reference to the next chunk from the reader
-            let buf = buf_reader.fill_buf().unwrap();
-            buf_len = buf.len();
-            // println!("buf_len: {}", buf.len());
+        // read the next chunk
+        let bytes_read = file.read_at(&mut buf, offset as u64).unwrap();
+        if bytes_read < BUF_SIZE {
+            buf.truncate(bytes_read);
+        }
 
-            // if buf is empty, we've reached the end so break
-            if buf.is_empty() {
-                // still need to check carry if its not empty
-                if !carry.is_empty() {
-                    let semicolon_pos = memchr::memchr(b';', &carry).unwrap();
-                    let name_slice = &carry[..semicolon_pos];
-                    let temp_slice = &carry[semicolon_pos+1..];
-                    let temp = parse_temp(temp_slice);
-                    map.get_mut(name_slice).add_temp(temp, name_slice);
-                }
-                break;
-            }
+        // main line reading loop
+        let mut line_start = 0;
+        loop {
+            let slice = &buf[line_start..];
+            if let Some(newline_pos) = find_char(slice, b'\n') {
+                let semicolon_pos = find_char(slice, b';').unwrap();
 
-            let mut line_start = 0;
-
-            // first deal with carry (if it exists)
-            if !carry.is_empty() {
-                let newline_pos = buf.iter().position(|c| *c == b'\n').unwrap();
-                carry.extend_from_slice(&buf[..newline_pos]);
-                let semicolon_pos = carry.iter().position(|c| *c == b';').unwrap();
-
-                let name_slice = &carry[..semicolon_pos];
-                let temp_slice = &carry[semicolon_pos+1..];
+                let name_slice = &slice[..semicolon_pos];
+                let temp_slice = &slice[semicolon_pos+1..newline_pos];
                 let temp = parse_temp(temp_slice);
                 map.get_mut(name_slice).add_temp(temp, name_slice);
 
-                carry.clear();
-                line_start = newline_pos + 1;
-            }
-
-            // main line reading loop
-            loop {
-                let slice = &buf[line_start..];
-                if let Some(newline_pos) = find_char(slice, b'\n') {
-                    let semicolon_pos = find_char(slice, b';').unwrap();
-
-                    let name_slice = &slice[..semicolon_pos];
-                    let temp_slice = &slice[semicolon_pos+1..newline_pos];
-                    let temp = parse_temp(temp_slice);
-                    map.get_mut(name_slice).add_temp(temp, name_slice);
-
-                    line_start += newline_pos + 1;
-                } else {
-                    break;
-                }
-            }
-
-            // put the leftover in carry
-            if line_start < buf.len() {
-                carry.extend_from_slice(&buf[line_start..]);
+                line_start += newline_pos + 1;
+            } else {
+                break;
             }
         }
 
-        buf_reader.consume(buf_len);
+        // advance offset and break when we've read the entire file segment
+        offset += line_start;
+        if offset >= end_pos {
+            break;
+        }
     }
+    return map;
 }
 
+#[inline(always)]
 fn find_char(buf: &[u8], target: u8) -> Option<usize> {
     if buf.len() >= 48 {
         let first = u8x16::from_slice(&buf[..16]);
@@ -115,6 +141,7 @@ fn find_char(buf: &[u8], target: u8) -> Option<usize> {
     }
 }
 
+#[inline(always)]
 fn first_match_in_u8x16(v: u8x16, target: u8) -> Option<usize> {
     let mask = v.simd_eq(Simd::splat(target));
     let bits = mask.to_bitmask();
@@ -125,6 +152,7 @@ fn first_match_in_u8x16(v: u8x16, target: u8) -> Option<usize> {
     }
 }
 
+#[inline(always)]
 fn parse_temp(line: &[u8]) -> i32 {
     let mut temp = 0;
     for c in line {
@@ -155,7 +183,7 @@ fn format_output(map: &CustomHashMap) -> String {
 
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct StationData {
     min_temp: i32,
     max_temp: i32,
@@ -165,6 +193,7 @@ struct StationData {
 }
 
 impl StationData {
+    #[inline(always)]
     pub fn new() -> Self {
         Self {
             min_temp: i32::MAX,
@@ -174,6 +203,7 @@ impl StationData {
             name: None
         }
     }
+    #[inline(always)]
     pub fn add_temp(&mut self, temp: i32, name: &[u8]) {
         self.min_temp = self.min_temp.min(temp);
         self.max_temp = self.max_temp.max(temp);
@@ -181,6 +211,16 @@ impl StationData {
         self.count += 1;
         if self.name.is_none() {
             self.name = Some(name.to_vec());
+        }
+    }
+    #[inline(always)]
+    pub fn merge_with(&mut self, other: &StationData) {
+        self.min_temp = self.min_temp.min(other.min_temp);
+        self.max_temp = self.max_temp.max(other.max_temp);
+        self.total += other.total;
+        self.count += other.count;
+        if self.name.is_none() {
+            self.name = other.name.clone();
         }
     }
     pub fn format_data_point(&self) -> String {
@@ -194,23 +234,25 @@ impl StationData {
 }
 
 struct CustomHashMap {
-    backing: [StationData ; 32_768]
+    backing: Vec<StationData>,
 }
 
 impl CustomHashMap {
     pub fn new() -> Self {
         Self {
-            backing: core::array::from_fn(|_| StationData::new())
+            backing: vec![StationData::new() ; 32_768]
         }
     }
+    #[inline(always)]
     pub fn get_mut(&mut self, key: &[u8]) -> &mut StationData {
         let u64_key = get_u64_key(key);
         let hashed_key = mix64(u64_key);
-        let index = hashed_key as usize & (self.backing.len() - 1);
+        let index = hashed_key as usize & (32_768 - 1);
         return &mut self.backing[index];
     }
 }
 
+#[inline(always)]
 fn get_u64_key(bytes: &[u8]) -> u64 {
     let key = u64::from_le_bytes([
         bytes[0],
@@ -225,6 +267,7 @@ fn get_u64_key(bytes: &[u8]) -> u64 {
     return key;
 }
 
+#[inline(always)]
 fn mix64(mut x: u64) -> u64 {
     x ^= x >> 30;
     x = x.wrapping_mul(0xbf58476d1ce4e5b9);
