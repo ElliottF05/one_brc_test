@@ -72,6 +72,7 @@ fn main() {
     // misc::store_city_names();
     // misc::test_hash_function();
     // misc::find_seed();
+    // misc::test_read_speed(4);
     // return;
 
     // run the 1brc code

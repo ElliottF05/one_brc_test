@@ -1,8 +1,9 @@
-use std::{collections::{HashMap, HashSet}, hash::{DefaultHasher, Hash, Hasher}};
+use std::{collections::HashMap, fs::File, os::unix::fs::FileExt, thread, time::Instant};
+
 
 use regex::Regex;
 
-use crate::CORRECT_RESULTS_PATH;
+use crate::{CORRECT_RESULTS_PATH, MEASUREMENTS_PATH};
 
 pub fn store_city_names() {
     let correct = std::fs::read_to_string(CORRECT_RESULTS_PATH).unwrap();
@@ -135,4 +136,42 @@ pub fn test_hash_function() {
     }
     println!("len strings: {}", strings.len());
     println!("len hashes: {}", hashes.len());
+}
+
+pub fn test_read_speed(num_threads: usize) {
+
+    let start_time = Instant::now();
+
+    fn read_chunk(file: File, start: usize, end: usize) -> usize {
+        const BUF_SIZE: usize = 4 * 1024 * 1024;
+        let mut buf = vec![0u8 ; BUF_SIZE].into_boxed_slice();
+
+        let mut offset = start;
+        let mut total_bytes_read = 0;
+
+        while offset + BUF_SIZE <= end {
+            let bytes_read = file.read_at(&mut buf, offset as u64).unwrap();
+            offset += bytes_read;
+            total_bytes_read += bytes_read;
+        }
+
+        return total_bytes_read;
+    }
+
+    let file = File::open(MEASUREMENTS_PATH).unwrap();
+    let file_len = file.metadata().unwrap().len() as usize;
+
+    let chunk_size = file_len / num_threads;
+    
+    let handles: Vec<_> = (0..num_threads)
+        .map(|i| {
+            let file_clone = file.try_clone().unwrap();
+            thread::spawn( move || read_chunk(file_clone, i * chunk_size, (i+1) * chunk_size))
+        })
+        .collect();
+
+    let total_bytes_read: usize = handles.into_iter().map(|h| h.join().unwrap()).sum();
+    
+    println!("TOTAL_BYTES_READ: {}", total_bytes_read);
+    println!("TIME_ELAPSED: {}", start_time.elapsed().as_secs_f32())
 }
